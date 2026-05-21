@@ -1,11 +1,50 @@
 cmake_minimum_required(VERSION 3.20)
+include(FetchContent)
 
 # Задаем версию стандарта
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# НАЗВАНИЕ ПРОЕКТА
+# Название проекта
 project(GraphLayouts VERSION 1.0 LANGUAGES CXX)
+
+# Определение функций
+function(add_external_dependency LIB_NAME GIT_URL)
+    set(LOCAL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libs/${LIB_NAME}")
+
+    if(EXISTS "${LOCAL_PATH}/CMakeLists.txt")
+        # Вариант 1: Уже скачано локально
+        message(STATUS "[AUTO-DEP] ${LIB_NAME} найден локально. Подключаем...")
+        add_subdirectory("${LOCAL_PATH}" "${CMAKE_CURRENT_BINARY_DIR}/${LIB_NAME}_build")
+    else()
+        # Вариант 2: Папки нет, настраиваем гит и качаем
+        message(STATUS "[AUTO-DEP] ${LIB_NAME} не найден. Скачиваем с GitHub...")
+
+        # Настройка .gitignore
+        set(GITIGNORE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/.gitignore")
+        set(IGNORE_ENTRY "libs/${LIB_NAME}/")
+        if(EXISTS "${GITIGNORE_FILE}")
+            file(READ "${GITIGNORE_FILE}" GITIGNORE_CONTENT)
+            string(FIND "${GITIGNORE_CONTENT}" "${IGNORE_ENTRY}" ENTRY_FOUND)
+            if(ENTRY_FOUND EQUAL -1)
+                file(APPEND "${GITIGNORE_FILE}" "\n${IGNORE_ENTRY}\n")
+            endif()
+        else()
+            file(WRITE "${GITIGNORE_FILE}" "${IGNORE_ENTRY}\n")
+        endif()
+
+        # Скачивание
+        include(FetchContent)
+        FetchContent_Declare(
+            ${LIB_NAME}
+            GIT_REPOSITORY ${GIT_URL}
+            GIT_TAG        main
+            SOURCE_DIR     "${LOCAL_PATH}"
+            BINARY_DIR     "${CMAKE_CURRENT_BINARY_DIR}/${LIB_NAME}_build"
+        )
+        FetchContent_MakeAvailable(${LIB_NAME})
+    endif()
+endfunction()
 
 ### Заполняем файлы проекта
 # Хедеры
@@ -20,30 +59,10 @@ set("${CMAKE_PROJECT_NAME}_LIB_CPP"
 )
 
 # Внешние либы для библиотеки (например: Glad, GLFW)
-include(FetchContent)
+add_external_dependency(gpuBuffers "https://github.com/xXxslavchickxXx/gpuBuffers.git")
+add_external_dependency(shaderIntrospector "https://github.com/xXxslavchickxXx/ShaderIntrospector")
 
 add_subdirectory(libs/introspector)
-
-find_package(gpuBuffers QUIET)
-
-if(NOT gpuBuffers_FOUND)
-    message(STATUS "gpuBuffers не найден локально. Качаем с GitHub...")
-
-    FetchContent_Declare(
-        gpuBuffers
-        GIT_REPOSITORY https://github.com/xXxslavchickxXx/gpuBuffers.git
-        GIT_TAG        main
-        
-        # --- ВОТ ЭТИ ДВЕ СТРОКИ ДЕЛАЮТ МАГИЮ ---
-        # Указываем качать исходники прямо в корень твоего проекта в папку libs
-        SOURCE_DIR     "${CMAKE_CURRENT_SOURCE_DIR}/libs/gpuBuffers"
-        
-        # Временные файлы сборки (объектники, логи) пусть остаются внутри out/build
-        BINARY_DIR     "${CMAKE_CURRENT_BINARY_DIR}/gpuBuffers_build"
-    )
-
-    FetchContent_MakeAvailable(gpuBuffers)
-endif()
 
 find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
