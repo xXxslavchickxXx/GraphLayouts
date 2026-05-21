@@ -1,0 +1,6 @@
+[submodule "libs/buffers"]
+	path = libs/buffers
+	url = https://github.com/xXxslavchickxXx/gpuBuffers
+[submodule "libs/shader"]
+	path = libs/shader
+	url = https://github.com/xXxslavchickxXx/shader_lib
