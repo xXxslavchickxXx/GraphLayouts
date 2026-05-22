@@ -8,17 +8,51 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Название проекта
 project(GraphLayouts VERSION 1.0 LANGUAGES CXX)
 
-# Определение функций
+### Определение функций
+# Функция скачивания необходимых зависимостей репы(часто не оффициальные модули)
 function(add_external_dependency LIB_NAME GIT_URL)
     set(LOCAL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libs/${LIB_NAME}")
+    set(NEED_DOWNLOAD FALSE)
 
     if(EXISTS "${LOCAL_PATH}/CMakeLists.txt")
-        # Вариант 1: Уже скачано локально
-        message(STATUS "[AUTO-DEP] ${LIB_NAME} найден локально. Подключаем...")
+        message(STATUS "[AUTO-DEP] ${LIB_NAME} найден локально. Проверяем актуальность версии...")
+        
+        # 1. Получаем хэш локального коммита
+        execute_process(
+            COMMAND git rev-parse HEAD
+            WORKING_DIRECTORY "${LOCAL_PATH}"
+            OUTPUT_VARIABLE LOCAL_HASH
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
+        )
+        
+        # 2. Получаем хэш последнего коммита с сервера
+        execute_process(
+            COMMAND git ls-remote ${GIT_URL} refs/heads/main
+            OUTPUT_VARIABLE REMOTE_LS
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
+        )
+        
+        # Вырезаем чистый хэш из строки ответа ls-remote
+        string(REGEX MATCH "^[0-9a-f]+" REMOTE_HASH "${REMOTE_LS}")
+
+        # 3. Сравниваем хэши
+        if(NOT "${LOCAL_HASH}" STREQUAL "${REMOTE_HASH}" AND NOT "${REMOTE_HASH}" STREQUAL "")
+            message(STATUS "[AUTO-DEP] Обнаружена новая версия ${LIB_NAME} на GitHub! Перекачиваем...")
+            set(NEED_DOWNLOAD TRUE)
+            file(REMOVE_RECURSE "${LOCAL_PATH}")
+        endif()
+    else()
+        set(NEED_DOWNLOAD TRUE)
+    endif()
+
+    # Логика подключения или скачивания
+    if(NOT NEED_DOWNLOAD)
+        message(STATUS "[AUTO-DEP] Версия ${LIB_NAME} актуальна. Подключаем...")
         add_subdirectory("${LOCAL_PATH}" "${CMAKE_CURRENT_BINARY_DIR}/${LIB_NAME}_build")
     else()
-        # Вариант 2: Папки нет, настраиваем гит и качаем
-        message(STATUS "[AUTO-DEP] ${LIB_NAME} не найден. Скачиваем с GitHub...")
+        message(STATUS "[AUTO-DEP] Скачиваем/Обновляем ${LIB_NAME} с GitHub...")
 
         # Настройка .gitignore
         set(GITIGNORE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/.gitignore")
@@ -33,7 +67,7 @@ function(add_external_dependency LIB_NAME GIT_URL)
             file(WRITE "${GITIGNORE_FILE}" "${IGNORE_ENTRY}\n")
         endif()
 
-        # Скачивание
+        # Скачивание через FetchContent
         include(FetchContent)
         FetchContent_Declare(
             ${LIB_NAME}
@@ -61,8 +95,6 @@ set("${CMAKE_PROJECT_NAME}_LIB_CPP"
 # Внешние либы для библиотеки (например: Glad, GLFW)
 add_external_dependency(gpuBuffers "https://github.com/xXxslavchickxXx/gpuBuffers.git")
 add_external_dependency(shaderIntrospector "https://github.com/xXxslavchickxXx/ShaderIntrospector")
-
-add_subdirectory(libs/introspector)
 
 find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
@@ -107,7 +139,7 @@ if(${CMAKE_PROJECT_NAME}_LIB_H OR ${CMAKE_PROJECT_NAME}_LIB_CPP)
         add_library(${CMAKE_PROJECT_NAME} ${LIB_TYPE}
             ${${CMAKE_PROJECT_NAME}_LIB_H}
             ${${CMAKE_PROJECT_NAME}_LIB_CPP}
-        )
+         "include/graph_layouts/attribute_layout/traits.h"  "include/graph_layouts/attribute_layout/proxy/proxy.h")
     endif()
 
     # Настройка инклудов
