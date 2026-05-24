@@ -20,6 +20,8 @@ using namespace ag::gpu;
 struct camera_data {
     glm::mat4 uView;
     glm::mat4 uProj;
+    camera_data() = default;
+    camera_data(glm::mat4 uview, glm::mat4 uproj) : uView(uview), uProj(uproj) {}
 };
 
 int main()
@@ -48,19 +50,27 @@ int main()
         1, 2, 3
     };
 
-    camera_data camera_0{
-        glm::mat4(1.f),
-        glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f)
-    };
-
-    camera_data camera_1{
+    camera_data camera_0 (
         glm::lookAt(
             glm::vec3(0.0f, 0.0f, 3.0f),  // позиция камеры (отодвинули назад)
             glm::vec3(0.0f, 0.0f, 0.0f),  // смотрим в центр
             glm::vec3(0.0f, 1.0f, 0.0f)   // up вектор
         ),
         glm::mat4(1.f)
-    };
+    );
+
+    camera_data camera_1 (
+        glm::mat4(1.f),
+        glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f)
+    );
+
+    camera_data camera_2;
+        camera_2.uView = glm::lookAt(
+            glm::vec3(0.0f, 0.0f, 3.0f),  // позиция камеры (отодвинули назад)
+            glm::vec3(0.0f, 0.0f, 0.0f),  // смотрим в центр
+            glm::vec3(0.0f, 1.0f, 0.0f)   // up вектор
+        ),
+        camera_2.uProj = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
     /// Апи лайаутов и того что есть
     // Рефлектор
@@ -78,14 +88,16 @@ int main()
     /*ag::uniform_buffer ubo;
     ubo.bind_base(0);
     ag::uniform_buffer::bind_block(program.getId(), "CameraBlock", 0);
-    ubo.upload(camera);*/
+    ubo.upload_part(camera_2, 1);*/
 
     ag::layout::uniform_blocks_layout u_layout(program.getId());
 
-    // Настриваем то, что будет происходить в игровом цикле
+    //std::cout << u_layout;
 
-    std::cout << "Element 0 name: " << u_layout["CameraBlock"][0].name << std::endl;
-    std::cout << "Element 1 name: " << u_layout["CameraBlock"][1].name << std::endl;
+    // Настриваем то, что будет происходить в игровом цикле
+    //std::cout << 
+    u_layout["CameraBlock"][1]["uProj"];
+    //u_layout["CameraBlock"][1].set_impl(camera_1);
 
     auto gameLoop = [&]() {
         program.bind();
@@ -105,8 +117,8 @@ int main()
         );
 
         camera_0.uView = view_matrix;
-
-        u_layout["CameraBlock"] = std::initializer_list<camera_data>{camera_1, camera_0};
+            
+        //u_layout["CameraBlock"][0] = camera_0;
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     };

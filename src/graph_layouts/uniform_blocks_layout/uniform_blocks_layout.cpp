@@ -8,32 +8,63 @@ namespace ag::layout {
             os << std::format(" {}, {}, {}, {} \n", mat[i][0], mat[i][1], mat[i][2], mat[i][3]);
         return os;
     }
-	uniform_blocks_layout::uniform_blocks_layout(GLuint program, GLenum draw_mode) 
-	: reflector(program), blocks()
-	{
+    uniform_blocks_layout::uniform_blocks_layout(GLuint program, GLenum draw_mode)
+        : reflector(program), blocks()
+    {
         using namespace iterators;
 
-        for (auto [block_name, datas] : reflector) {
-            auto buffer_ = std::make_shared<ag::uniform_buffer>(draw_mode);
-            buffer_->allocate(datas.byte_size());
-            buffer_->bind_base(datas.binding);
+        GLuint currentBinding = 0;  // текущий binding point
 
+        for (const auto& [block_name, datas] : reflector) {
+            // Получаем общий размер для массива блоков
+            GLint totalSize = 0;
+            for (const auto& data : datas) {
+                totalSize += data.byte_size;
+            }
+
+            // Создаем ОДИН буфер на весь массив блоков
+            auto buffer_ = std::make_shared<ag::uniform_buffer>(draw_mode);
+            buffer_->allocate(totalSize);
+
+            // Создаем последовательность для этого массива блоков
             uniform_block_sequence sequence(buffer_, datas, program, block_name);
+
+            GLint offset = 0;  // смещение для текущего блока в буфере
+
             for (auto data : datas) {
+                // Привязываем диапазон буфера к binding point
+                buffer_->bind_range(currentBinding, currentBinding,  offset, data.byte_size);
+
+                // Привязываем uniform block в шейдере к тому же binding point
+                ag::uniform_buffer::bind_block(program, data.name, currentBinding);
+
+                // Сохраняем binding в данных
+                data.binding = currentBinding;
+
+                // Создаем прокси для блока
                 uniform_block_data dater(buffer_, data);
-                for (auto [view_name, view] : data) {
+
+                // Добавляем все мемберы
+                for (const auto& [view_name, view] : data) {
                     uniform_block_view viewer(buffer_, view);
-                    for (auto handle : view) {
+                    for (const auto& handle : view) {
                         viewer.add_entry(uniform_block_field(buffer_, handle));
                     }
                     dater.add_member(std::move(viewer));
                 }
+
+                // Сохраняем binding в прокси
+                dater.get_raw().binding = currentBinding;
                 sequence.add_entry(std::move(dater));
+
+                // Сдвигаем offset и binding для следующего элемента
+                offset += data.byte_size;
+                currentBinding++;
             }
 
-            blocks.insert_or_assign(block_name, sequence);
+            blocks.insert_or_assign(block_name, std::move(sequence));
         }
-	}
+    }
 
     std::ostream& operator<<(std::ostream& os, uniform_blocks_layout& layout) {
         os << "==================================================\n";

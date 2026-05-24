@@ -18,6 +18,8 @@ namespace ag::iterators {
 		template_uniform_setter(std::shared_ptr<ag::uniform_buffer> buffer_ptr, const Composition& composit)
 		: buffer_ref(buffer_ptr), composit(composit) {}
 
+
+
 		template_uniform_setter(template_uniform_setter&&) = default;
 		template_uniform_setter& operator=(template_uniform_setter&&) = default;
 		template_uniform_setter(const template_uniform_setter&) = default;
@@ -33,7 +35,7 @@ namespace ag::iterators {
 			return static_cast<Derived*>(this)->get<T>();
 		}
 
-		const Composition& get_raw() { return composit; }
+		Composition& get_raw() { return composit; }
 
 		friend std::ostream& operator<<(std::ostream& os, const template_uniform_setter<Derived, Composition>& composit) {
 			os << composit.composit;

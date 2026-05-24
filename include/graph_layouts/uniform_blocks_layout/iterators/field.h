@@ -1,13 +1,14 @@
 #pragma once
 
 #include <graph_layouts/uniform_blocks_layout/iterators/template_iterator.h>
+#include <uniformBlockReflector/uniformBlockField.h>
 #include <graph_layouts/concepts/concepts.h>
 
 namespace ag::iterators {
 	class uniform_block_field :
-	public template_uniform_setter<uniform_block_field, uniform_block_handle>
+	public template_uniform_setter<uniform_block_field, uniform_block_field_info>
 	{
-	using Setter = template_uniform_setter<uniform_block_field, uniform_block_handle>;
+	using Setter = template_uniform_setter<uniform_block_field, uniform_block_field_info>;
 	public:
 		using Setter::Setter;
 		using Setter::operator=;

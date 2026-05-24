@@ -1,22 +1,24 @@
 #pragma once
 
-#include <graph_layouts/uniform_blocks_layout/iterators/template_iterator.h>
-#include <templates/opengl_iterator.h>
-#include <graph_layouts/concepts/concepts.h>
+#include <uniformBlockReflector/uniformBlockView.h>
+#include <tuple>
 
 #include <graph_layouts/uniform_blocks_layout/iterators/field.h>
 
-#include <tuple>
 
 namespace ag::iterators {
 	class uniform_block_view :
-	public opengl_template_iterator<uniform_block_view, uniform_block_field>,
-	public template_uniform_setter<uniform_block_view, uniform_block_member>
+		private template_uniform_setter<uniform_block_view, uniform_block_view_info>,
+		private opengl_template_iterator<uniform_block_view, uniform_block_field>
 	{
-	using Setter = template_uniform_setter<uniform_block_view, uniform_block_member>;
+	using Setter = template_uniform_setter<uniform_block_view, uniform_block_view_info>;
 	using Iterator = opengl_template_iterator<uniform_block_view, uniform_block_field>;
+
 	public:
-		using Setter::Setter;
+		uniform_block_view() = default;
+		uniform_block_view(std::shared_ptr<ag::uniform_buffer> buffer_ref, const uniform_block_view_info& info)
+			: Setter(buffer_ref, info) {}
+
 		using Setter::operator=;
 		using Iterator::operator[];
 		using Iterator::operator->;

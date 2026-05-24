@@ -1,21 +1,21 @@
 #pragma once
 
 #include <graph_layouts/uniform_blocks_layout/iterators/data.h>
-#include <uniformBlockReflector/uniformBlockIterator.h>
+#include <uniformBlockReflector/uniformBlockSequence.h>
 
 #include <memory>
 
 namespace ag::iterators {
 	class uniform_block_sequence :
-		public opengl_template_iterator<uniform_block_sequence, uniform_block_data>,
-		public template_uniform_setter<uniform_block_sequence, shader::uniform_block_iterator>
+		private opengl_template_iterator<uniform_block_sequence, uniform_block_data>,
+		private template_uniform_setter<uniform_block_sequence, shader::uniform_block_sequence_info>
 	{
-		using Setter = template_uniform_setter<uniform_block_sequence, shader::uniform_block_iterator>;
+		using Setter = template_uniform_setter<uniform_block_sequence, shader::uniform_block_sequence_info>;
 		using Iterator = opengl_template_iterator<uniform_block_sequence, uniform_block_data>;
 
 		std::shared_ptr<ag::uniform_buffer> buffer_owner;
 	public:
-		uniform_block_sequence(std::shared_ptr<ag::uniform_buffer> buffer, const shader::uniform_block_iterator& composit,
+		uniform_block_sequence(std::shared_ptr<ag::uniform_buffer> buffer, const shader::uniform_block_sequence_info& composit,
 		GLint program, const std::string& name)
 			: buffer_owner(buffer), Setter(buffer, composit), Iterator(name, program) {}
 
@@ -23,6 +23,7 @@ namespace ag::iterators {
 		using Setter::operator=;
 		using Iterator::operator[];
 		using Iterator::operator->;
+		using Iterator::print;
 		using Iterator::add_entry;
 		using Iterator::size;
 		using Iterator::begin;
@@ -66,16 +67,14 @@ namespace ag::iterators {
 
 			size_t idx = 0;
 			for (const auto& value : list) {
-				// Ищем в мапе entries тот блок, который должен быть idx-ым по счету на GPU.
-				// Мы вычисляем его целевой оффсет: индекс * размер структуры
 				size_t target_offset = idx * sizeof(T);
-
 				bool block_found = false;
-				for (auto& [name, data_block] : this->entries) {
-					// composit — это твой uniform_block_info из рефлектора для этого блока.
-					// Проверяем, совпадает ли его оффсет с тем, куда мы хотим записать текущую камеру
-					if (static_cast<size_t>(data_block.get_raw().offset) == target_offset) {
-						data_block.set_impl(value);
+
+				// Тупо бежим по вектору через обычный индекс
+				for (size_t i = 0; i < this->entries.size(); ++i) {
+					// Берем напрямую элемент вектора. Никаких разыменований итераторов.
+					if (static_cast<size_t>(this->entries[i].composit.offset) == target_offset) {
+						this->entries[i].set_impl(value);
 						block_found = true;
 						break;
 					}
