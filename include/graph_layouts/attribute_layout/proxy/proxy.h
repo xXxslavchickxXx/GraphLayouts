@@ -18,13 +18,13 @@ namespace ag::layout {
 			}
 		}
 
-		vertex_buffer* operator[](size_t i) {
-			if (!vao || buffers.empty()) return nullptr;
+		auto operator[](size_t i) {
+			if (!vao || buffers.empty()) std::cerr << "этот буффер мертв";
 			return (*vao)[buffers[i]];
 		}
 
-		vertex_buffer* operator->() {
-			if (!vao || buffers.empty()) return nullptr;
+		auto operator->() {
+			if (!vao || buffers.empty()) std::cerr << "этот буффер мертв";
 			return (*vao)[buffers[0]];
 		}
 	};

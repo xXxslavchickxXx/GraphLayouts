@@ -86,10 +86,16 @@ set("${CMAKE_PROJECT_NAME}_LIB_H"
     include/window/window.h
     include/window/window.inl
     include/graph_layouts/attribute_layout/attribute_layout.h
+    "include/graph_layouts/attribute_layout/traits.h"
+    "include/graph_layouts/attribute_layout/proxy/proxy.h"
+    include/graph_layouts/uniform_blocks_layout/uniform_blocks_layout.h
+    "include/graph_layouts/uniform_blocks_layout/iterators/template_iterator.h"
+    "include/graph_layouts/uniform_blocks_layout/iterators/field.h"
 )
 # Еденицы трансляции
 set("${CMAKE_PROJECT_NAME}_LIB_CPP"
     src/graph_layouts/attribute_layout/attribute_layout.cpp
+    src/graph_layouts/uniform_blocks_layout/uniform_blocks_layout.cpp
 )
 
 # Внешние либы для библиотеки (например: Glad, GLFW)
@@ -139,7 +145,7 @@ if(${CMAKE_PROJECT_NAME}_LIB_H OR ${CMAKE_PROJECT_NAME}_LIB_CPP)
         add_library(${CMAKE_PROJECT_NAME} ${LIB_TYPE}
             ${${CMAKE_PROJECT_NAME}_LIB_H}
             ${${CMAKE_PROJECT_NAME}_LIB_CPP}
-         "include/graph_layouts/attribute_layout/traits.h"  "include/graph_layouts/attribute_layout/proxy/proxy.h")
+          "include/graph_layouts/uniform_blocks_layout/iterators/view.h" "include/graph_layouts/concepts/concepts.h" "include/graph_layouts/uniform_blocks_layout/iterators/data.h" "include/graph_layouts/uniform_blocks_layout/iterators/sequence.h")
     endif()
 
     # Настройка инклудов

@@ -5,7 +5,7 @@ Window::Window(int width, int height, const std::string& title) :
 {
     glfwInit();
 
-    windowPtr = glfwCreateWindow(width, height, "jopa", nullptr, nullptr);
+    windowPtr = glfwCreateWindow(width, height, "window", nullptr, nullptr);
     glfwMakeContextCurrent(windowPtr);
     glClearColor(0.3, 0.4, 0.6, 1);
 
