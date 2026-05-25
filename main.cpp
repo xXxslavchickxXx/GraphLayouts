@@ -56,40 +56,26 @@ int main()
             glm::vec3(0.0f, 0.0f, 0.0f),  // смотрим в центр
             glm::vec3(0.0f, 1.0f, 0.0f)   // up вектор
         ),
-        glm::ortho(-1, 1, -1, 1, 1, 5)
+        glm::ortho(-1.f, 1.f, -1.f, 1.f, -5.f, 5.f)
     );
-
-    camera_data camera_1 (
-        glm::mat4(1.f),
-        glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.f, 100.0f)
-    );
-
-    camera_data camera_2;
-        camera_2.uView = glm::lookAt(
-            glm::vec3(0.0f, 0.0f, 3.0f),  // позиция камеры (отодвинули назад)
-            glm::vec3(0.0f, 0.0f, 0.0f),  // смотрим в центр
-            glm::vec3(0.0f, 1.0f, 0.0f)   // up вектор
-        ),
-        camera_2.uProj = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
     /// Апи лайаутов и того что есть
     // Рефлектор
     shader::uniform_reflector reflector(program.getId());
 
     reflector["model"] = glm::mat4(1.f);
+    reflector["uView"] = camera_0.uView;
+    reflector["uProj"] = camera_0.uProj;
+
     // Аттрибуты
     ag::layout::attribute_layout a_layout(program.getId());
 
     a_layout["aPos"]->upload(points);
     a_layout["aColor"][1]->upload(colors);
     a_layout.index_buffer()->upload(indices);
+
     // Юниформ блоки
-
     ag::layout::uniform_blocks_layout u_layout(program.getId());
-
-    //u_layout["CameraBlock"][1] = camera_2;
-    u_layout["CameraBlock"][1]["uProj"][1] = false ? glm::mat4(1.f) : camera_0.uProj;
-    u_layout["CameraBlock"][1]["uView"] = true ? glm::mat4(1.f) : camera_0.uView;
 
     auto gameLoop = [&]() {
         program.bind();
@@ -103,14 +89,12 @@ int main()
 
         static glm::mat4 view_matrix = glm::mat4(1.f);
         view_matrix = glm::lookAt(
-            glm::vec3(3.0f * cos(0.5 * angle), 0.f, 3.0f * sin(0.5 * angle)),  // позиция камеры (отодвинули назад)
+            glm::vec3(3.0f * cos(0.5 * angle), 0.f, 3.0f * sin(0.5 * angle)),  // вращаем камеру во круг центра координат
             glm::vec3(0.0f, 0.0f, 0.0f),  // смотрим в центр
             glm::vec3(0.0f, 1.0f, 0.0f)   // up вектор
         );
-
-        camera_0.uView = view_matrix;
             
-        //u_layout["CameraBlock"][0] = camera_0;
+        reflector["uView"] = view_matrix;
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     };
