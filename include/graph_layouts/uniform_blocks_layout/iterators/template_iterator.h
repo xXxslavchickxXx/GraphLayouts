@@ -114,6 +114,11 @@ namespace ag::iterators {
 		using OTI::operator->;
 		using Setter::get_raw;
 
+		template<typename T>
+		void operator=(const T& value) {
+			Setter::operator=(value);  // вызываем оператор базового класса
+		}
+
 		oitus_template() = default;
 		oitus_template(
 		std::shared_ptr<ag::uniform_buffer> buffer_ptr,

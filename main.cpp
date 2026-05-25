@@ -56,12 +56,12 @@ int main()
             glm::vec3(0.0f, 0.0f, 0.0f),  // смотрим в центр
             glm::vec3(0.0f, 1.0f, 0.0f)   // up вектор
         ),
-        glm::mat4(1.f)
+        glm::ortho(-1, 1, -1, 1, 1, 5)
     );
 
     camera_data camera_1 (
         glm::mat4(1.f),
-        glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f)
+        glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.f, 100.0f)
     );
 
     camera_data camera_2;
@@ -87,10 +87,9 @@ int main()
 
     ag::layout::uniform_blocks_layout u_layout(program.getId());
 
-    u_layout["CameraBlock"][1] = camera_2;
-    //std::cout << u_layout["CameraBlock"][1]["uProj"] = camera_0.uProj;
-    //std::cout << u_layout["CameraBlock"][1]["uProj"] = camera_0.uProj;
-    //u_layout["CameraBlock"][1]["uProj"][0].set_impl(camera_2.uProj);
+    //u_layout["CameraBlock"][1] = camera_2;
+    u_layout["CameraBlock"][1]["uProj"][1] = false ? glm::mat4(1.f) : camera_0.uProj;
+    u_layout["CameraBlock"][1]["uView"] = true ? glm::mat4(1.f) : camera_0.uView;
 
     auto gameLoop = [&]() {
         program.bind();

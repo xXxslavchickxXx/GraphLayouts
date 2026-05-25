@@ -14,6 +14,11 @@ namespace ag::iterators {
 	public:
 		using Base::Base;
 
+		template<typename T>
+		void operator=(const T& value) {
+			Base::operator=(value);
+		}
+
 		template<ag::concepts::Container T>
 		void set(const T& value) {
 			set_impl(value);

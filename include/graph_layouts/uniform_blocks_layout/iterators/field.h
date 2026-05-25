@@ -11,6 +11,10 @@ namespace ag::iterators {
 	using Setter = template_uniform_setter<uniform_block_field, uniform_block_field_info>;
 	public:
 		using Setter::Setter;
+		template<typename T>
+		void operator=(const T& value) {
+			Setter::operator=(value);
+		}
 
 		template<ag::concepts::Scalar T>
 		void set(const T& value) {
