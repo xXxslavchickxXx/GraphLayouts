@@ -87,8 +87,9 @@ int main()
 
     ag::layout::uniform_blocks_layout u_layout(program.getId());
 
-    //u_layout["CameraBlock"][1] = camera_2;
-    std::cout << u_layout["CameraBlock"][1]["uProj"];
+    u_layout["CameraBlock"][1] = camera_2;
+    //std::cout << u_layout["CameraBlock"][1]["uProj"] = camera_0.uProj;
+    //std::cout << u_layout["CameraBlock"][1]["uProj"] = camera_0.uProj;
     //u_layout["CameraBlock"][1]["uProj"][0].set_impl(camera_2.uProj);
 
     auto gameLoop = [&]() {

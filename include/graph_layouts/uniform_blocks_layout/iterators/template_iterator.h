@@ -74,6 +74,9 @@ namespace ag::iterators {
 		void operator=(const T& value) {
 			Setter::operator=(value);  // вызываем оператор базового класса
 		}
+		auto& operator[](const char* name) {
+			return Base::operator[](std::string(name));
+		}
 
 		template<typename T>
 		operator T() const {
@@ -116,16 +119,6 @@ namespace ag::iterators {
 		std::shared_ptr<ag::uniform_buffer> buffer_ptr,
 		const Composition& composit,
 		const std::string& name) : Setter(buffer_ptr, composit), OTI(name) {}
-
-		template<typename T>
-		void operator=(const T& value) {
-			Setter::operator=(value);  // вызываем оператор базового класса
-		}
-
-		template<typename T>
-		operator T() const {
-			return Setter::operator T();
-		}
 
 		friend std::ostream& operator<<(std::ostream& os, const Base& composit) {
 			os << composit.composit;

@@ -12,8 +12,10 @@ namespace ag::iterators {
     public:
         using Base::Base;
         using Base::operator[];
-        auto& operator[](const char* name) {
-            return Base::operator[](std::string(name));
+
+        template<typename T>
+        void operator=(const T& value) {
+            Base::operator=(value);
         }
 
         template<typename T>
