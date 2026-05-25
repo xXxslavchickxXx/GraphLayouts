@@ -11,7 +11,6 @@ namespace ag::iterators {
 	using Setter = template_uniform_setter<uniform_block_field, uniform_block_field_info>;
 	public:
 		using Setter::Setter;
-		using Setter::operator=;
 
 		template<ag::concepts::Scalar T>
 		void set(const T& value) {
@@ -31,7 +30,7 @@ namespace ag::iterators {
 				throw std::runtime_error("Passed data size exceeds uniform block member size on GPU");
 			}
 
-			buffer->upload_part(&value, input_size_bytes, composit.offset);
+			buffer->upload_part(value, composit.offset);
 		}
 
 		template<typename T>

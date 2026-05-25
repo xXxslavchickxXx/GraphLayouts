@@ -27,30 +27,31 @@ namespace ag::layout {
             buffer_->allocate(totalSize);
 
             // Создаем последовательность для этого массива блоков
-            uniform_block_sequence sequence(buffer_, datas, program, block_name);
+            uniform_block_sequence sequence(buffer_, datas, block_name);
 
             GLint offset = 0;  // смещение для текущего блока в буфере
 
             for (auto data : datas) {
                 // Привязываем диапазон буфера к binding point
-                buffer_->bind_range(currentBinding, currentBinding,  offset, data.byte_size);
+                buffer_->bind_range(currentBinding, offset, data.byte_size);
 
                 // Привязываем uniform block в шейдере к тому же binding point
                 ag::uniform_buffer::bind_block(program, data.name, currentBinding);
+                //std::cout << std::format("prog: {}, name: {}, bind: {}\n", program, data.name, currentBinding) << '\n';
 
                 // Сохраняем binding в данных
                 data.binding = currentBinding;
 
                 // Создаем прокси для блока
-                uniform_block_data dater(buffer_, data);
+                uniform_block_data dater(buffer_, data, data.name);
 
                 // Добавляем все мемберы
                 for (const auto& [view_name, view] : data) {
-                    uniform_block_view viewer(buffer_, view);
+                    uniform_block_view viewer( buffer_, view, view_name);
                     for (const auto& handle : view) {
                         viewer.add_entry(uniform_block_field(buffer_, handle));
                     }
-                    dater.add_member(std::move(viewer));
+                    dater[view_name] = (std::move(viewer));
                 }
 
                 // Сохраняем binding в прокси
@@ -61,7 +62,6 @@ namespace ag::layout {
                 offset += data.byte_size;
                 currentBinding++;
             }
-
             blocks.insert_or_assign(block_name, std::move(sequence));
         }
     }
@@ -80,7 +80,7 @@ namespace ag::layout {
         for (const auto& [block_name, proxy] : layout.blocks) {
             // Вызываем метод print, который ты реализовал в uniform_proxy.
             // Он сам по цепочке вызовет принт у sequence, data, view и field!
-            proxy.print(os, 0);
+            os << proxy;
             os << "--------------------------------------------------\n";
         }
 

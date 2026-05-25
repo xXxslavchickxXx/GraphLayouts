@@ -8,24 +8,11 @@
 
 namespace ag::iterators {
 	class uniform_block_view :
-		private template_uniform_setter<uniform_block_view, uniform_block_view_info>,
-		private opengl_template_iterator<uniform_block_view, uniform_block_field>
+	public oitus_template<uniform_block_view, uniform_block_field, uniform_block_view_info>
 	{
-	using Setter = template_uniform_setter<uniform_block_view, uniform_block_view_info>;
-	using Iterator = opengl_template_iterator<uniform_block_view, uniform_block_field>;
-
+		using Base = oitus_template<uniform_block_view, uniform_block_field, uniform_block_view_info>;
 	public:
-		uniform_block_view() = default;
-		uniform_block_view(std::shared_ptr<ag::uniform_buffer> buffer_ref, const uniform_block_view_info& info)
-			: Setter(buffer_ref, info) {}
-
-		using Setter::operator=;
-		using Iterator::operator[];
-		using Iterator::operator->;
-		using Iterator::add_entry;
-		using Iterator::size;
-		using Iterator::begin;
-		using Iterator::end;
+		using Base::Base;
 
 		template<ag::concepts::Container T>
 		void set(const T& value) {
@@ -38,6 +25,22 @@ namespace ag::iterators {
 			std::vector<FirstType> vec{ args... };
 
 			set_impl(vec);
+		}
+
+		template<ag::concepts::Scalar T>
+		void set_impl(const T& value) {
+			auto buffer = buffer_ref.lock();
+			if (!buffer) {
+				throw std::runtime_error("UBO is dead");
+			}
+
+			size_t input_size_bytes = sizeof(T);
+
+			if (input_size_bytes > static_cast<size_t>(composit.byte_size())) {
+				throw std::runtime_error("Passed data size exceeds uniform block member size on GPU");
+			}
+
+			buffer->upload_part(value, composit->offset);
 		}
 
 		template<ag::concepts::Container T>
@@ -68,11 +71,6 @@ namespace ag::iterators {
 			buffer->download_part(size_bytes, container.data(), composit.offset);
 
 			return container;
-		}
-
-		friend std::ostream& operator<<(std::ostream& os, const uniform_block_view& composit) {
-			os << composit.composit;
-			return os;
 		}
 	};
 }

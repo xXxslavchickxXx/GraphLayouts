@@ -85,19 +85,11 @@ int main()
     a_layout.index_buffer()->upload(indices);
     // Юниформ блоки
 
-    /*ag::uniform_buffer ubo;
-    ubo.bind_base(0);
-    ag::uniform_buffer::bind_block(program.getId(), "CameraBlock", 0);
-    ubo.upload_part(camera_2, 1);*/
-
     ag::layout::uniform_blocks_layout u_layout(program.getId());
 
-    //std::cout << u_layout;
-
-    // Настриваем то, что будет происходить в игровом цикле
-    //std::cout << 
-    u_layout["CameraBlock"][1]["uProj"];
-    //u_layout["CameraBlock"][1].set_impl(camera_1);
+    //u_layout["CameraBlock"][1] = camera_2;
+    std::cout << u_layout["CameraBlock"][1]["uProj"];
+    //u_layout["CameraBlock"][1]["uProj"][0].set_impl(camera_2.uProj);
 
     auto gameLoop = [&]() {
         program.bind();

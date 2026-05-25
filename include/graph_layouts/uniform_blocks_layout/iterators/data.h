@@ -6,29 +6,14 @@
 
 namespace ag::iterators {
     class uniform_block_data :
-    private template_uniform_setter<uniform_block_data, uniform_block_data_info>,
-    private template_container_iterator<uniform_block_data,
-        std::unordered_map<std::string, uniform_block_view>,
-        std::string, uniform_block_view>
+    public umtus_template<uniform_block_data, uniform_block_view, uniform_block_data_info>
     {
-    using Setter = template_uniform_setter<uniform_block_data, uniform_block_data_info>;
-    using Iterator = template_container_iterator<uniform_block_data,
-        std::unordered_map<std::string, uniform_block_view>,
-        std::string, uniform_block_view>;
-
+        using Base = umtus_template<uniform_block_data, uniform_block_view, uniform_block_data_info>;
     public:
-        uniform_block_data() = default;
-        uniform_block_data(std::shared_ptr<ag::uniform_buffer> buffer_ref, uniform_block_data_info& info)
-            : Setter(buffer_ref, info) {}
-
-        using Iterator::begin;
-        using Iterator::end;
-        using Iterator::size;
-        using Iterator::operator[];
-        using Setter::operator=;
-
-        void add_member(uniform_block_view&& member) {
-            this->entries[member.name] = std::move(member);
+        using Base::Base;
+        using Base::operator[];
+        auto& operator[](const char* name) {
+            return Base::operator[](std::string(name));
         }
 
         template<typename T>
@@ -63,15 +48,6 @@ namespace ag::iterators {
 
             buffer->download_part(size_bytes, &value);
             return value;
-        }
-
-        void print(std::ostream& os, int indent = 0) const override {
-            composit.print(os, indent);
-        }
-
-        friend std::ostream& operator<<(std::ostream& os, const uniform_block_data& composit) {
-            os << composit.composit;
-            return os;
         }
 
         friend class uniform_block_sequence;

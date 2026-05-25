@@ -6,50 +6,26 @@
 #include <memory>
 
 namespace ag::iterators {
-	class uniform_block_sequence :
-		private opengl_template_iterator<uniform_block_sequence, uniform_block_data>,
-		private template_uniform_setter<uniform_block_sequence, shader::uniform_block_sequence_info>
-	{
-		using Setter = template_uniform_setter<uniform_block_sequence, shader::uniform_block_sequence_info>;
-		using Iterator = opengl_template_iterator<uniform_block_sequence, uniform_block_data>;
-
+	class uniform_block_sequence : 
+	public oitus_template<uniform_block_sequence, uniform_block_data, shader::uniform_block_sequence_info> {
+		using Base = oitus_template<uniform_block_sequence, uniform_block_data, shader::uniform_block_sequence_info>;
 		std::shared_ptr<ag::uniform_buffer> buffer_owner;
-	public:
-		uniform_block_sequence(std::shared_ptr<ag::uniform_buffer> buffer, const shader::uniform_block_sequence_info& composit,
-		GLint program, const std::string& name)
-			: buffer_owner(buffer), Setter(buffer, composit), Iterator(name, program) {}
 
-		using Setter::Setter;
-		using Setter::operator=;
-		using Iterator::operator[];
-		using Iterator::operator->;
-		using Iterator::print;
-		using Iterator::add_entry;
-		using Iterator::size;
-		using Iterator::begin;
-		using Iterator::end;
+	public:
+		uniform_block_sequence(
+		std::shared_ptr<ag::uniform_buffer> ubo,
+		const shader::uniform_block_sequence_info& info,
+		const std::string& name) : Base(ubo, info, name), buffer_owner(ubo) {}
 
 		template<ag::concepts::Container T>
 		void set(const T& value) {
 			set_impl(value);
 		}
 
-		// Вариативный сеттер (через запятую: sequence.set(cam1, cam2, cam3))
-		/*template<typename... T>
-			requires (sizeof...(T) > 0)
-		void set(const T&... args) {
-			using FirstType = std::tuple_element_t<0, std::tuple<T...>>;
-			std::vector<FirstType> vec{ args... };
-
-			set_impl(vec);
-		}*/
-
 		template<typename... Args>
 		void set(Args&&... args) {
 			size_t idx = 0;
 
-			// Вместо operator[](idx++) мы берем entries СТРОГО по порядку вычисления пакета
-			// Но так как базовый operator[] может косячить, давай завяжемся на явный индекс.
 			int dummy[] = { 0, (this->entries[idx++].set_impl(std::forward<Args>(args)), 0)... };
 			(void)dummy;
 		}
@@ -133,11 +109,6 @@ namespace ag::iterators {
 			}
 
 			return container;
-		}
-
-		friend std::ostream& operator<<(std::ostream& os, const uniform_block_sequence& composit) {
-			os << composit.composit;
-			return os;
 		}
 	};
 }
