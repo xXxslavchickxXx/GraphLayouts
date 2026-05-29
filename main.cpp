@@ -56,7 +56,8 @@ int main()
             glm::vec3(0.0f, 0.0f, 0.0f),  // смотрим в центр
             glm::vec3(0.0f, 1.0f, 0.0f)   // up вектор
         ),
-        glm::ortho(-1.f, 1.f, -1.f, 1.f, -5.f, 5.f)
+        glm::perspective(45.f, 800.f/600.f, 0.1f, 100.f)
+        //glm::ortho(-1.f, 1.f, -1.f, 1.f, -5.f, 5.f)
     );
 
     /// Апи лайаутов и того что есть
@@ -64,8 +65,8 @@ int main()
     shader::uniform_reflector reflector(program.getId());
 
     reflector["model"] = glm::mat4(1.f);
-    reflector["uView"] = camera_0.uView;
-    reflector["uProj"] = camera_0.uProj;
+    //reflector["uView"] = camera_0.uView;
+    //reflector["uProj"] = camera_0.uProj;
 
     // Аттрибуты
     ag::layout::attribute_layout a_layout(program.getId());
@@ -76,6 +77,9 @@ int main()
 
     // Юниформ блоки
     ag::layout::uniform_blocks_layout u_layout(program.getId());
+
+    u_layout["CameraBlock"][0]["uView"] = camera_0.uView;
+    u_layout["CameraBlock"][0]["uProj"][0] = camera_0.uProj;
 
     auto gameLoop = [&]() {
         program.bind();
@@ -94,7 +98,8 @@ int main()
             glm::vec3(0.0f, 1.0f, 0.0f)   // up вектор
         );
             
-        reflector["uView"] = view_matrix;
+        //reflector["uView"] = view_matrix;
+        u_layout["CameraBlock"][0]["uView"] = view_matrix;
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     };
