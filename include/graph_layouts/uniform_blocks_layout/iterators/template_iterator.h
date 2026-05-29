@@ -50,12 +50,12 @@ namespace ag::iterators {
 	/// <typeparam name="Composition"></typeparam>
 	template<typename Derived, typename Entry, typename Composition>
 	class umtus_template :
-		private template_container_iterator<Derived, std::unordered_map<std::string, Entry>, std::string, Entry>,
+		protected template_container_iterator<Derived, std::unordered_map<std::string, Entry>, const std::string&, Entry>,
 		public template_uniform_setter<Derived, Composition>
 	{
 		using Base = umtus_template<Derived, Entry, Composition>;
 		using Setter = template_uniform_setter<Derived, Composition>;
-		using UM = template_container_iterator<Derived, std::unordered_map<std::string, Entry>, std::string, Entry>;
+		using UM = template_container_iterator<Derived, std::unordered_map<std::string, Entry>, const std::string&, Entry>;
 
 	protected:
 		using Setter::composit;
@@ -73,9 +73,6 @@ namespace ag::iterators {
 		template<typename T>
 		void operator=(const T& value) {
 			Setter::operator=(value);  // вызываем оператор базового класса
-		}
-		auto& operator[](const char* name) {
-			return Base::operator[](std::string(name));
 		}
 
 		template<typename T>
@@ -97,20 +94,21 @@ namespace ag::iterators {
 	/// <typeparam name="Composition"></typeparam>
 	template<typename Derived, typename Entry, typename Composition>
 	class oitus_template :
-		protected opengl_template_iterator<Derived, Entry>,
+		private opengl_template_iterator<Derived, Entry>,
 		public template_uniform_setter<Derived, Composition>
 	{
 		using Base = oitus_template<Derived, Entry, Composition>;
 		using Setter = template_uniform_setter<Derived, Composition>;
 		using OTI = opengl_template_iterator<Derived, Entry>;
+		using OTI::operator[];
 
 	protected:
+		using OTI::entries;
 		using Setter::composit;
 		using Setter::buffer_ref;
 
 	public:
 		using OTI::add_entry;
-		using OTI::operator[];
 		using OTI::operator->;
 		using Setter::get_raw;
 

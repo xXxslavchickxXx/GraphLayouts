@@ -11,6 +11,7 @@ namespace ag::iterators {
         using Base = umtus_template<uniform_block_data, uniform_block_view, uniform_block_data_info>;
     public:
         using Base::Base;
+        using Base::operator[];
 
         template<typename T>
         void operator=(const T& value) {

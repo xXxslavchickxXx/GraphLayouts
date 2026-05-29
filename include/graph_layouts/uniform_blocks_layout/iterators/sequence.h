@@ -12,6 +12,8 @@ namespace ag::iterators {
 		std::shared_ptr<ag::uniform_buffer> buffer_owner;
 
 	public:
+		using Base::operator[];
+
 		uniform_block_sequence(
 		std::shared_ptr<ag::uniform_buffer> ubo,
 		const shader::uniform_block_sequence_info& info,

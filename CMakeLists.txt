@@ -12,6 +12,12 @@ project(GraphLayouts VERSION 1.0 LANGUAGES CXX)
 ### Определение функций
 # Функция скачивания необходимых зависимостей репы(часто не оффициальные модули)
 function(add_external_dependency LIB_NAME GIT_URL)
+    # Если таргет уже есть, то выходим из функции
+    if(TARGET ${LIB_NAME})
+        message(STATUS "[AUTO-DEP] Поток сборки: ${LIB_NAME} уже предоставлен главным проектом. Пропускаем.")
+        return()
+    endif()
+
     set(LOCAL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libs/${LIB_NAME}")
     set(NEED_DOWNLOAD FALSE)
 

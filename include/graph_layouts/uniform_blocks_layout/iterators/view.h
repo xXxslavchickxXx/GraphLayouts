@@ -11,8 +11,11 @@ namespace ag::iterators {
 	public oitus_template<uniform_block_view, uniform_block_field, uniform_block_view_info>
 	{
 		using Base = oitus_template<uniform_block_view, uniform_block_field, uniform_block_view_info>;
+		using Base::entries;
+
 	public:
 		using Base::Base;
+		using Base::operator[];
 
 		template<typename T>
 		void operator=(const T& value) {
@@ -23,7 +26,7 @@ namespace ag::iterators {
 		void set(const T& value) {
 			set_impl(value);
 		}
-
+		
 		template<ag::concepts::Scalar... T>
 		void set(const T&... args) {
 			using FirstType = std::tuple_element_t<0, std::tuple<T...>>;

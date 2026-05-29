@@ -78,8 +78,8 @@ int main()
     // Юниформ блоки
     ag::layout::uniform_blocks_layout u_layout(program.getId());
 
-    u_layout["CameraBlock"][0]["uView"] = camera_0.uView;
-    u_layout["CameraBlock"][0]["uProj"][0] = camera_0.uProj;
+    u_layout["CameraBlock"]["uView"] = camera_0.uView;
+    u_layout["CameraBlock"]["uProj"][0] = camera_0.uProj;
 
     auto gameLoop = [&]() {
         program.bind();
