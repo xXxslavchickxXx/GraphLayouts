@@ -98,6 +98,11 @@ set("${CMAKE_PROJECT_NAME}_LIB_H"
     include/graph_layouts/uniform_blocks_layout/uniform_blocks_layout.h
     "include/graph_layouts/uniform_blocks_layout/iterators/template_iterator.h"
     "include/graph_layouts/uniform_blocks_layout/iterators/field.h"
+    include/graph_layouts/shader_layout/shader_layout.h
+    "include/graph_layouts/uniform_blocks_layout/iterators/view.h"
+    "include/graph_layouts/concepts/concepts.h"
+    "include/graph_layouts/uniform_blocks_layout/iterators/data.h"
+    "include/graph_layouts/uniform_blocks_layout/iterators/sequence.h"
 )
 # Еденицы трансляции
 set("${CMAKE_PROJECT_NAME}_LIB_CPP"
@@ -152,12 +157,13 @@ if(${CMAKE_PROJECT_NAME}_LIB_H OR ${CMAKE_PROJECT_NAME}_LIB_CPP)
         add_library(${CMAKE_PROJECT_NAME} ${LIB_TYPE}
             ${${CMAKE_PROJECT_NAME}_LIB_H}
             ${${CMAKE_PROJECT_NAME}_LIB_CPP}
-          "include/graph_layouts/uniform_blocks_layout/iterators/view.h" "include/graph_layouts/concepts/concepts.h" "include/graph_layouts/uniform_blocks_layout/iterators/data.h" "include/graph_layouts/uniform_blocks_layout/iterators/sequence.h")
+        )
     endif()
 
     # Настройка инклудов
     target_include_directories(${CMAKE_PROJECT_NAME} ${SCOPE_TYPE}
         "${CMAKE_CURRENT_SOURCE_DIR}/include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/graph_layouts/shader_layout"
     )
 
     # Включение в либу доп либ      

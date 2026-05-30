@@ -4,14 +4,10 @@
 #include <GL/glew.h>
 #include <window/window.h>
 
-#include <graph_layouts/attribute_layout/attribute_layout.h>
-#include <graph_layouts/uniform_blocks_layout/uniform_blocks_layout.h>
+#include <shader_layout.h>
 
 // Сабдирректории
 #include <shaderProgram/ShaderProgram.h>
-#include <AGreflection.h>
-#include <vertex/vertex_array.hpp>
-#include <uniform/uniform_buffer.hpp>
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -33,9 +29,9 @@ int main()
     auto program = shader::ShaderProgram::from_path("assets/shaders/V.glsl", "assets/shaders/F.glsl");
 
     std::vector<glm::vec3> points = {
-        glm::vec3(0.3f,  0.5f,  0.f),
+        glm::vec3( 0.3f,  0.5f,  0.f),
         glm::vec3(-0.3f,  0.5f,  0.f),
-        glm::vec3(0.3f, -0.5f,  0.f),
+        glm::vec3( 0.3f, -0.5f,  0.f),
         glm::vec3(-0.3f, -0.5f,  0.f)
     };
     std::vector<glm::vec3> colors = {
@@ -57,33 +53,24 @@ int main()
             glm::vec3(0.0f, 1.0f, 0.0f)   // up вектор
         ),
         glm::perspective(45.f, 800.f/600.f, 0.1f, 100.f)
-        //glm::ortho(-1.f, 1.f, -1.f, 1.f, -5.f, 5.f)
     );
 
-    /// Апи лайаутов и того что есть
-    // Рефлектор
+    /// Апи лайаутов и того что есть (это просто офигенно)
     shader::uniform_reflector reflector(program.getId());
+    ag::layout::shader_layout layout(program.getId());
 
-    reflector["model"] = glm::mat4(1.f);
-    //reflector["uView"] = camera_0.uView;
-    //reflector["uProj"] = camera_0.uProj;
+    layout.uniform["model"] = glm::mat4(1.f);
 
-    // Аттрибуты
-    ag::layout::attribute_layout a_layout(program.getId());
+    layout.block["CameraBlock"]["uView"] = camera_0.uView;
+    layout.block["CameraBlock"]["uProj"][0] = camera_0.uProj;
 
-    a_layout["aPos"]->upload(points);
-    a_layout["aColor"][1]->upload(colors);
-    a_layout.index_buffer()->upload(indices);
-
-    // Юниформ блоки
-    ag::layout::uniform_blocks_layout u_layout(program.getId());
-
-    u_layout["CameraBlock"]["uView"] = camera_0.uView;
-    u_layout["CameraBlock"]["uProj"][0] = camera_0.uProj;
+    layout.attribute["aPos"]->upload(points);
+    layout.attribute["aColor"][1]->upload(colors);
+    layout.attribute.index_buffer()->upload(indices);
 
     auto gameLoop = [&]() {
         program.bind();
-        a_layout.bind();
+        layout.bind();
 
         static float angle = 0.f;
         static glm::vec3 rotate_axis{ 1.f, 0.f, 0.f };
@@ -98,8 +85,7 @@ int main()
             glm::vec3(0.0f, 1.0f, 0.0f)   // up вектор
         );
             
-        //reflector["uView"] = view_matrix;
-        u_layout["CameraBlock"][0]["uView"] = view_matrix;
+        layout.block["CameraBlock"]["uView"] = view_matrix;
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     };
