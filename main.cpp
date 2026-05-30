@@ -61,20 +61,14 @@ int main()
 
     layout.uniform["model"] = glm::mat4(1.f);
 
-    layout.block["CameraBlock"][0]["uView"][0] = glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 3.0f),  // позиция камеры (отодвинули назад)
-        glm::vec3(0.0f, 0.0f, 0.0f),  // смотрим в центр
-        glm::vec3(0.0f, 1.0f, 0.0f)   // up вектор
-    );
-    layout.block["CameraBlock"][0]["uProj"][1].set_impl(glm::perspective(45.f, 800.f / 600.f, 0.1f, 100.f));
+    layout.block["CameraBlock"]["uView"][0] = camera_0.uView;
+    layout.block["CameraBlock"]["uProj"][1] = camera_0.uProj;
 
     layout.attribute["aPos"]->upload(points);
     layout.attribute["aColor"][1]->upload(colors);
     layout.attribute.index_buffer()->upload(indices);
 
-    //std::vector<camera_data> cam = layout.block["CameraBlock"];
-
-    std::cout << layout.block;
+    //std::cout << layout.block;
 
     auto gameLoop = [&]() {
         program.bind();
@@ -88,12 +82,12 @@ int main()
 
         static glm::mat4 view_matrix = glm::mat4(1.f);
         view_matrix = glm::lookAt(
-            glm::vec3(3.0f * cos(0.5 * angle), 0.f, 3.0f * sin(0.5 * angle)),  // вращаем камеру во круг центра координат
+            glm::vec3(3.0f * cos(1 * angle), 0.f, 3.0f * sin(1 * angle)),  // вращаем камеру во круг центра координат
             glm::vec3(0.0f, 0.0f, 0.0f),  // смотрим в центр
             glm::vec3(0.0f, 1.0f, 0.0f)   // up вектор
         );
 
-        //layout.block["CameraBlock"]["uView"] = view_matrix;
+        layout.block["CameraBlock"]["uView"] = view_matrix;
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     };
