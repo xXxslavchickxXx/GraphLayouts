@@ -128,8 +128,8 @@ set("${CMAKE_PROJECT_NAME}_EXAMPLE_LIBS"
 )
 
 # Настройка опции создания исполняемого файла
-option(${CMAKE_PROJECT_NAME}_BUILD_EXAMPLE "Построить пример для проекта" ON)
-option(${CMAKE_PROJECT_NAME}_ASSET_TO_BUILD "Копировать ассеты в папку сборки" ON)
+option(${CMAKE_PROJECT_NAME}_BUILD_EXAMPLE "Построить пример для проекта" OFF)
+option(${CMAKE_PROJECT_NAME}_ASSET_TO_BUILD "Копировать ассеты в папку сборки" OFF)
 
 
 ### Проверка, надо ли вообще либу собирать
