@@ -31,7 +31,7 @@ namespace ag::iterators {
 
 		template<typename T>
 		operator T() const {
-			return static_cast<Derived*>(this)->get<T>();
+			return static_cast<const Derived*>(this)->get<T>();
 		}
 
 		Composition& get_raw() { return composit; }

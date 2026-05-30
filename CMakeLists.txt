@@ -90,8 +90,6 @@ endfunction()
 ### Заполняем файлы проекта
 # Хедеры
 set("${CMAKE_PROJECT_NAME}_LIB_H"
-    include/window/window.h
-    include/window/window.inl
     include/graph_layouts/attribute_layout/attribute_layout.h
     "include/graph_layouts/attribute_layout/traits.h"
     "include/graph_layouts/attribute_layout/proxy/proxy.h"
