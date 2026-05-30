@@ -68,9 +68,9 @@ int main()
     layout.attribute["aColor"][1]->upload(colors);
     layout.attribute.index_buffer()->upload(indices);
 
-    glm::mat4 proj = layout.block["CameraBlock"]["uProj"][1];
+    std::vector<camera_data> cam = layout.block["CameraBlock"];
 
-    std::cout << proj;
+    std::cout << cam[0].uView;
 
     auto gameLoop = [&]() {
         program.bind();

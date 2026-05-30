@@ -24,6 +24,7 @@ public:
 };
 
 #include <consoleTools.h>
+#include <iomanip>
 /// <summary>
 /// Просто возможность вывода матрицы
 /// </summary>
@@ -52,14 +53,13 @@ std::ostream& operator<<(std::ostream& os, const T& data) {
     auto current_stride = get_cursor_position().x;
     std::string str_stride(current_stride, ' ');
 
-    os << str_stride << "glm::mat" << rows << 'x' << cols << '\n';
     for (int i = 0; i < rows; i++) {
-        os << str_stride;
+        os << str_stride << "  [";
         for (int j = 0; j < cols; j++) {
-            os << data[i][j];
+            os << std::fixed << std::setprecision(3) << std::setw(7) << data[i][j];
             if (j < cols - 1) os << " ";
         }
-        if (i < rows - 1) os << '\n';
+        os << " ]\n";
     }
     return os;
 }
