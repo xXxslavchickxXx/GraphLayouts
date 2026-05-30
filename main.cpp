@@ -3,6 +3,7 @@
 #include <cmath>
 #include <GL/glew.h>
 #include <window/window.h>
+#include <exception>
 
 #include <shader_layout.h>
 
@@ -56,13 +57,12 @@ int main()
     );
 
     /// Апи лайаутов и того что есть (это просто офигенно)
-    shader::uniform_reflector reflector(program.getId());
     ag::layout::shader_layout layout(program.getId());
 
     layout.uniform["model"] = glm::mat4(1.f);
 
     layout.block["CameraBlock"]["uView"] = camera_0.uView;
-    layout.block["CameraBlock"]["uProj"][0] = camera_0.uProj;
+    layout.block["CameraBlock"]["uProj"][1] = camera_0.uProj;
 
     layout.attribute["aPos"]->upload(points);
     layout.attribute["aColor"][1]->upload(colors);
@@ -76,7 +76,7 @@ int main()
         static glm::vec3 rotate_axis{ 1.f, 0.f, 0.f };
         angle += 0.0001;
 
-        reflector["model"] = glm::rotate(glm::mat4(1.f), 3 * angle, rotate_axis);
+        layout.uniform["model"] = glm::rotate(glm::mat4(1.f), 3 * angle, rotate_axis);
 
         static glm::mat4 view_matrix = glm::mat4(1.f);
         view_matrix = glm::lookAt(
@@ -84,7 +84,7 @@ int main()
             glm::vec3(0.0f, 0.0f, 0.0f),  // смотрим в центр
             glm::vec3(0.0f, 1.0f, 0.0f)   // up вектор
         );
-            
+
         layout.block["CameraBlock"]["uView"] = view_matrix;
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);

@@ -48,7 +48,7 @@ namespace ag::iterators {
 				throw std::runtime_error("Passed data size exceeds uniform block member size on GPU");
 			}
 
-			buffer->upload_part(value, composit->offset);
+			buffer->upload_part(value, composit.offset);
 		}
 
 		template<ag::concepts::Container T>
