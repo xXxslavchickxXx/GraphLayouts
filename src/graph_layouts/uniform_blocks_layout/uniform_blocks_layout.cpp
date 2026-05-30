@@ -1,4 +1,5 @@
 #include <graph_layouts/uniform_blocks_layout/uniform_blocks_layout.h>
+#include <uniform/uniform_buffer.hpp>
 
 #include <format>
 

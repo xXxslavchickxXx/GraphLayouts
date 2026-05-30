@@ -1,0 +1,27 @@
+﻿{
+	"configurations": [
+		{
+			"name": "x64-Debug",
+			"generator": "Ninja",
+			"configurationType": "Debug",
+			"inheritEnvironments": [ "msvc_x64_x64" ],
+			"buildRoot": "${projectDir}\\out\\build\\${name}",
+			"installRoot": "${projectDir}\\out\\install\\${name}",
+			"cmakeCommandArgs": "",
+			"buildCommandArgs": "",
+			"ctestCommandArgs": "",
+			"variables": [
+				{
+					"name": "GraphLayouts_ASSET_TO_BUILD",
+					"value": "True",
+					"type": "BOOL"
+				},
+				{
+					"name": "GraphLayouts_BUILD_EXAMPLE",
+					"value": "True",
+					"type": "BOOL"
+				}
+			]
+		}
+	]
+}
