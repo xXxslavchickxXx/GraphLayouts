@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vertex/vertex_array.hpp>
+#include <vertex/vertex_array.h>
 #include <map>
 
 namespace ag::layout {

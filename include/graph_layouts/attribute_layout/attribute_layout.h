@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vertex/vertex_array.hpp>
+#include <vertex/vertex_array.h>
 #include <AGreflection.h>
 #include <graph_layouts/attribute_layout/proxy/proxy.h>
 

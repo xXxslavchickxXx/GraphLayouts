@@ -24,7 +24,8 @@ out vec4 outColor;
 void main() {
     vec4 worldPos = model * vec4(aPos, 1.0);
 
-    gl_Position = block[0].uProj[1] * block[0].uView * worldPos;
+    //gl_Position = block[0].uProj[1] * block[0].uView * worldPos;
+    gl_Position = some.uProj * some.uView * worldPos;
 
     //gl_Position = uProj * uView * worldPos;
 

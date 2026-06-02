@@ -61,14 +61,11 @@ int main()
 
     layout.uniform["model"] = glm::mat4(1.f);
 
-    layout.block["CameraBlock"]["uView"][0] = camera_0.uView;
-    layout.block["CameraBlock"]["uProj"][1] = camera_0.uProj;
+    layout.block["something"] = camera_0;
 
     layout.attribute["aPos"]->upload(points);
     layout.attribute["aColor"][1]->upload(colors);
     layout.attribute.index_buffer()->upload(indices);
-
-    //std::cout << layout.block;
 
     auto gameLoop = [&]() {
         program.bind();
@@ -86,8 +83,9 @@ int main()
             glm::vec3(0.0f, 0.0f, 0.0f),  // смотрим в центр
             glm::vec3(0.0f, 1.0f, 0.0f)   // up вектор
         );
+        camera_0.uView = view_matrix;
 
-        layout.block["CameraBlock"]["uView"] = view_matrix;
+        layout.block["something"] = camera_0;
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     };

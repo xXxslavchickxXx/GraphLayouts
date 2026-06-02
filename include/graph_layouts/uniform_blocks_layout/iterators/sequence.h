@@ -13,24 +13,12 @@ namespace ag::iterators {
 
 	public:
 		using Base::operator[];
+		using Base::operator=;
 
 		uniform_block_sequence(
 		std::shared_ptr<ag::uniform_buffer> ubo,
 		const shader::uniform_block_sequence_info& info,
 		const std::string& name) : Base(ubo, info, name), buffer_owner(ubo) {}
-
-		template<ag::concepts::Container T>
-		void set(const T& value) {
-			set_impl(value);
-		}
-
-		template<typename... Args>
-		void set(Args&&... args) {
-			size_t idx = 0;
-
-			int dummy[] = { 0, (this->entries[idx++].set_impl(std::forward<Args>(args)), 0)... };
-			(void)dummy;
-		}
 
 		template<typename T>
 		void set_impl(std::initializer_list<T> list) {
@@ -64,6 +52,22 @@ namespace ag::iterators {
 
 				idx++;
 			}
+		}
+
+		template<ag::concepts::TriviallyCopyable T>
+		void set_impl(const T& value) {
+			auto buffer = buffer_ref.lock();
+			if (!buffer) {
+				throw std::runtime_error("UBO is dead");
+			}
+
+			size_t input_size_bytes = sizeof(T);
+
+			if (input_size_bytes > static_cast<size_t>(composit.byte_size())) {
+				throw std::runtime_error("Passed data size exceeds uniform block member size on GPU");
+			}
+
+			buffer->upload_part(value, composit.offset);
 		}
 
 		// Системный сеттер, который вызывается в том числе через operator=

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <uniform/uniform_buffer.hpp>
+#include <uniform/uniform_buffer.h>
 #include <templates/template_iterator.h>
 #include <AGreflection.h>
 

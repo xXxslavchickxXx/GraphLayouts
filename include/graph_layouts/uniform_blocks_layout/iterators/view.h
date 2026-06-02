@@ -22,20 +22,7 @@ namespace ag::iterators {
 			Base::operator=(value);
 		}
 
-		template<ag::concepts::Container T>
-		void set(const T& value) {
-			set_impl(value);
-		}
-		
-		template<ag::concepts::Scalar... T>
-		void set(const T&... args) {
-			using FirstType = std::tuple_element_t<0, std::tuple<T...>>;
-			std::vector<FirstType> vec{ args... };
-
-			set_impl(vec);
-		}
-
-		template<ag::concepts::Scalar T>
+		template<ag::concepts::TriviallyCopyable T>
 		void set_impl(const T& value) {
 			auto buffer = buffer_ref.lock();
 			if (!buffer) {

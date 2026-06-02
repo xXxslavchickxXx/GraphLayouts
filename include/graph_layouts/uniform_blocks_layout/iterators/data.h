@@ -18,7 +18,7 @@ namespace ag::iterators {
             Base::operator=(value);
         }
 
-        template<typename T>
+        template<ag::concepts::TriviallyCopyable T>
         void set_impl(const T& value) {
             auto buffer = buffer_ref.lock();
             if (!buffer) {

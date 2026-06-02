@@ -2,7 +2,7 @@
 
 #include <graph_layouts/uniform_blocks_layout/iterators/template_iterator.h>
 #include <uniformBlockReflector/uniformBlockField.h>
-#include <graph_layouts/concepts/concepts.h>
+#include <concepts.h>
 
 namespace ag::iterators {
 	class uniform_block_field :
@@ -16,12 +16,7 @@ namespace ag::iterators {
 			Setter::operator=(value);
 		}
 
-		template<ag::concepts::Scalar T>
-		void set(const T& value) {
-			set_impl(value);
-		}
-
-		template<ag::concepts::Scalar T>
+		template<ag::concepts::TriviallyCopyable T>
 		void set_impl(const T& value) {
 			auto buffer = buffer_ref.lock();
 			if (!buffer) {

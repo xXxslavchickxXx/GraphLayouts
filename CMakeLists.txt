@@ -25,16 +25,15 @@ set(${PROJECT_NAME}_EXAMPLE_FILEPATH main.cpp)
 # 2. Ручное указание файлов твоей библиотеки (если хочешь перечислить конкретные файлы)
 set(${PROJECT_NAME}_LIB_H
     include/graph_layouts/attribute_layout/attribute_layout.h
-    "include/graph_layouts/attribute_layout/traits.h"
-    "include/graph_layouts/attribute_layout/proxy/proxy.h"
+    include/graph_layouts/attribute_layout/traits.h
+    include/graph_layouts/attribute_layout/proxy/proxy.h
     include/graph_layouts/uniform_blocks_layout/uniform_blocks_layout.h
-    "include/graph_layouts/uniform_blocks_layout/iterators/template_iterator.h"
-    "include/graph_layouts/uniform_blocks_layout/iterators/field.h"
+    include/graph_layouts/uniform_blocks_layout/iterators/template_iterator.h
+    include/graph_layouts/uniform_blocks_layout/iterators/field.h
     include/graph_layouts/shader_layout/shader_layout.h
-    "include/graph_layouts/uniform_blocks_layout/iterators/view.h"
-    "include/graph_layouts/concepts/concepts.h"
-    "include/graph_layouts/uniform_blocks_layout/iterators/data.h"
-    "include/graph_layouts/uniform_blocks_layout/iterators/sequence.h"
+    include/graph_layouts/uniform_blocks_layout/iterators/view.h
+    include/graph_layouts/uniform_blocks_layout/iterators/data.h
+    include/graph_layouts/uniform_blocks_layout/iterators/sequence.h
 )
 set(${PROJECT_NAME}_LIB_CPP
     src/graph_layouts/attribute_layout/attribute_layout.cpp
