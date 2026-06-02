@@ -14,7 +14,7 @@ namespace ag::layout {
     {
         using namespace iterators;
 
-        GLuint currentBinding = 0;  // текущий binding point
+        GLuint currentBinding = 1;  // текущий binding point
 
         for (const auto& [block_name, datas] : reflector) {
             // Получаем общий размер для массива блоков
@@ -33,15 +33,15 @@ namespace ag::layout {
             GLint offset = 0;  // смещение для текущего блока в буфере
 
             for (auto data : datas) {
-                // Привязываем диапазон буфера к binding point
-                buffer_->bind_range(currentBinding, offset, data.byte_size);
-
-                // Привязываем uniform block в шейдере к тому же binding point
-                ag::uniform_buffer::bind_block(program, data.name, currentBinding);
-                //std::cout << std::format("prog: {}, name: {}, bind: {}\n", program, data.name, currentBinding) << '\n';
-
-                // Сохраняем binding в данных
-                data.binding = currentBinding;
+                if (data.binding == 0) {
+                    // Привязываем диапазон буфера к binding point
+                    buffer_->bind_range(currentBinding, offset, data.byte_size);
+                    // Привязываем uniform block в шейдере к тому же binding point
+                    ag::uniform_buffer::bind_block(program, data.name, currentBinding);
+                    // Сохраняем binding в данных
+                    data.binding = currentBinding;
+                    currentBinding++;
+                }
 
                 // Создаем прокси для блока
                 uniform_block_data dater(buffer_, data, data.name);
@@ -56,12 +56,11 @@ namespace ag::layout {
                 }
 
                 // Сохраняем binding в прокси
-                dater.get_raw().binding = currentBinding;
+                dater.get_raw().binding = data.binding;
                 sequence.add_entry(std::move(dater));
 
                 // Сдвигаем offset и binding для следующего элемента
                 offset += data.byte_size;
-                currentBinding++;
             }
             blocks.insert_or_assign(block_name, std::move(sequence));
         }
